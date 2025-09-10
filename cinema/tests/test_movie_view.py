@@ -148,23 +148,6 @@ class MovieViewSetTests(APITestCase):
         self.assertTrue({"The Matrix", "John Wick"}.issubset(returned_titles))
 
 
-    def test_create_movie(self):
-        genre = sample_genre()
-        actor = sample_actor()
-        payload = {
-            "title": "Brand New Movie",
-            "description": "Fresh plot",
-            "duration": 130,
-            "genres": [genre.id],
-            "actors": [actor.id],
-        }
-
-        self.client.force_authenticate(user=self.admin)
-        res = self.client.post(self.movie_url, payload)
-
-        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
-        self.assertTrue(Movie.objects.filter(title="Brand New Movie").exists())
-
     def test_update_movie_put_as_admin(self):
         movie = sample_movie(title="Old", description="Old desc", duration=80)
         old_g = sample_genre("OldG")
@@ -186,6 +169,23 @@ class MovieViewSetTests(APITestCase):
         }
         res = self.client.put(url, payload, format="json")
         self.assertEqual(res.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+        def test_create_movie(self):
+            genre = sample_genre()
+            actor = sample_actor()
+            payload = {
+                "title": "Brand New Movie",
+                "description": "Fresh plot",
+                "duration": 130,
+                "genres": [genre.id],
+                "actors": [actor.id],
+            }
+
+            self.client.force_authenticate(user=self.admin)
+            res = self.client.post(self.movie_url, payload)
+
+            self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+            self.assertTrue(Movie.objects.filter(title="Brand New Movie").exists())
 
     def test_partial_update_movie_patch_as_admin(self):
         movie = sample_movie(title="PatchMe", description="D", duration=100)
